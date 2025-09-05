@@ -1,298 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Happy Birthday</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      background: linear-gradient(to right, #ffaab4, #ee9ca7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      font-family: 'Poppins', sans-serif;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<title>Happy Birthday</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: linear-gradient(to right, #ffaab4, #ee9ca7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+  }
 
-    h1 {
-      font-size: 5vw;
-      color: #fff;
-      text-shadow: 0 0 20px #ff4da6, 0 0 30px #ff99cc;
-      animation: glow 2s ease-in-out infinite alternate;
-      z-index: 10;
-    }
+  h1 {
+    font-size: 5vw;
+    color: #fff;
+    text-shadow: 0 0 20px #ff4da6, 0 0 30px #ff99cc;
+    animation: glow 2s ease-in-out infinite alternate;
+    z-index: 10;
+    text-align: center;
+  }
 
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #ff4da6, 0 0 20px #ff99cc; }
-      to { text-shadow: 0 0 30px #ff4da6, 0 0 50px #ff99cc; }
-    }
+  @keyframes glow {
+    from { text-shadow: 0 0 10px #ff4da6, 0 0 20px #ff99cc; }
+    to { text-shadow: 0 0 30px #ff4da6, 0 0 50px #ff99cc; }
+  }
 
-    /* Envelope base */
-    .envelope {
-      position: relative;
-      min-width: 240px;
-      min-height: 160px;
-      margin-top: 40px;
-      cursor: pointer;
-      z-index: 2;
-      transition: transform 1s ease;
-      width: 30vw;
-      height: 20vw; /* maintain 3:2 aspect ratio */
-    }
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    /* Envelope body */
-    .envelope .base {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: #fdcc77;
-      border: 2px solid #ff7eb3;
-      border-radius: 5px;
-      z-index: 2;
-      overflow: hidden;
-    }
+  /* Envelope */
+  .envelope {
+    position: relative;
+    width: 240px;
+    height: 160px;
+    margin-top: 40px;
+    cursor: pointer;
+    z-index: 2;
+    transition: transform 1s ease;
+  }
+  .envelope .base {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #fdcc77;
+    border: 2px solid #ff7eb3;
+    border-radius: 5px;
+    z-index: 2;
+    overflow: hidden;
+  }
+  .envelope .flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #fdcc77, #ff758c);
+    clip-path: polygon(0 0, 50% 50%, 100% 0);
+    transform-origin: top;
+    transition: transform 0.8s ease;
+    z-index: 3;
+  }
+  .envelope.open .flap {
+    transform: rotateX(180deg);
+  }
 
-    /* Envelope flap */
-    .envelope .flap {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #fdcc77, #ff758c);
-      clip-path: polygon(0 0, 50% 50%, 100% 0);
-      transform-origin: top;
-      transition: transform 0.8s ease;
-      z-index: 3;
-    }
+  .card {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 120px;
+    background: #fff8f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    text-align: center;
+    padding: 15px;
+    font-size: 1vw;
+    color: #0d0d0d;
+    transition: bottom 1s ease;
+    z-index: 1;
+  }
+  .envelope.open .card {
+    bottom: 140px;
+  }
 
-    .envelope.open .flap {
-      transform: rotateX(180deg); /* flap opens */
-    }
+  .envelope.fall {
+    animation: fallDown 1s forwards;
+  }
+  @keyframes fallDown {
+    to { transform: translateY(120vh) rotate(20deg); opacity:0; }
+  }
 
-    /* Card inside */
-    .card {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 200px;
-      height: 120px;
-      background: #fff8f0;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      text-align: center;
-      padding: 15px;
-      font-size: 1vw;
-      color: #0d0d0d;
-      transition: bottom 1s ease;
-      z-index: 1; /* under the flap, above the envelope body */
-    }
+  .falling {
+    position: absolute;
+    font-size: 2rem;
+    top: -50px;
+    animation: fall 5s linear forwards;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0); }
+    100% { transform: translateY(110vh) rotate(360deg); }
+  }
 
-    .envelope.open .card {
-      bottom: 140px; /* slides out */
-    }
+  #main-content.blur { filter: blur(6px); transition: filter 0.6s ease; }
 
-    /* Envelope fall */
-    .envelope.fall {
-      animation: fallDown 1s forwards;
-    }
+  .card-zoom {
+    position: fixed;
+    background: #fff8f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    text-align: center;
+    padding: 20px;
+    font-size: 2vw;
+    color: #0d0d0d;
+    z-index: 1000;
+    transition: all 1s ease;
+    transform: translate(-50%, -50%) scale(1);
+  }
 
-    @keyframes fallDown {
-      to {
-        transform: translateY(120vh) rotate(20deg);
-        opacity: 0;
-      }
-    }
+  /* Fade-in message under zoom card */
+  .zoom-message {
+    position: fixed;
+    top: 75%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2em;
+    color: #ff4da6;
+    opacity: 0;
+    transition: opacity 2s ease;
+    z-index: 1000;
+    text-align: center;
+  }
+  .zoom-message.show { opacity: 1; }
 
-    /* Falling emojis */
-    .falling {
-      position: absolute;
-      font-size: 2rem;
-      top: -50px;
-      animation: fall 5s linear forwards;
-      opacity: 0.9;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    @keyframes fall {
-      0% { transform: translateY(0) rotate(0); }
-      100% { transform: translateY(110vh) rotate(360deg); }
-    }
-
-    /* Blur background */
-    #main-content.blur {
-      filter: blur(6px);
-      transition: filter 0.6s ease;
-    }
-
-    /* Zoom card */
-   .card-zoom {
-  position: fixed;
-  background: #fff8f0;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  text-align: center;
-  padding: 20px;
-  font-size: 1.2em;
-  color: #0d0d0d;
-  z-index: 1000;
-  transition: all 1s ease;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-    .envelope {
-  margin: 40px auto 0 auto; /* auto left/right centers it */
-}
-
-.card-zoom {
-  position: fixed;
-  background: #fff8f0;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  text-align: center;
-  padding: 20px;
-  font-size: 1.2em;
-  color: #0d0d0d;
-  z-index: 1000;
-  transition: all 1s ease;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.close-btn {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  background: #ff6b81;
-  border: none;
-  color: white;
-  font-size: 1.2em;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: background 0.3s;
-}
-
-.close-btn:hover {
-  background: #e84118;
-}
-
-
-  </style>
+</style>
 </head>
 <body>
-  <div id="main-content">
-    <h1>🎉 Happy Birthday [Her Name]! 🎉</h1>
 
+<audio id="bg-music" autoplay loop muted>
+  <source src="happy-birthday.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="party-sound">
+  <source src="happy-birthday-357371.mp3" type="audio/mpeg">
+</audio>
+
+<div id="main-content">
+  <div class="content-wrapper">
+    <h1>🎉 Happy Birthday Nekochan! 🎉</h1>
     <div class="envelope" id="envelope">
       <div class="base"></div>
       <div class="flap"></div>
       <div class="card">
         💌 Happy Birthday! <br>
         Wishing you love, joy, and endless smiles ❤️<br>
-        Have a fantastic day! 🎂🎈<br>
-        With all my love, Vishesh 💖
+        I hope your life is full of beautifull memories<br>
+        and i am a rememberable part of it 😉<br>
+        Thanks for being there for me and<br>
+        emotionaly supporting me many times.<br>
+        You are an amazing person and i am lucky to have you in my life.<br>
+        ILYSM! 😘<br>
+        My qtcat😘<br>
       </div>
     </div>
   </div>
-  <audio id="bg-music" loop>
-  <source src="happy-birthday-357371.mp3" type="audio/mpeg">
-</audio>
+</div>
 
+<div class="zoom-message" id="zoom-msg">Hope your day is as special as you are ❤️</div>
 
-  <script>
-    const envelope = document.getElementById("envelope");
-    const mainContent = document.getElementById("main-content");
-    let holdTimeout;
-    const emojis = ["❤️","🎁","💖","🎉","✨"];
+<div id="cake" style="
+  position: fixed;
+  top: 65%;
+  left: 80%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 5rem;
+  opacity: 0;
+  transition: all 1s ease;
+  z-index: 1000;
+">🎂</div>
 
-    function createFallingEmoji() {
-      const emoji = document.createElement("div");
-      emoji.classList.add("falling");
-      emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-      emoji.style.left = Math.random() * window.innerWidth + "px";
-      emoji.style.fontSize = (20 + Math.random() * 30) + "px";
-      document.body.appendChild(emoji);
-      setTimeout(() => emoji.remove(), 5000);
-    }
+<img id="bitmoji" src="WhatsApp_Image_2025-09-05_at_10.01.37_PM-removebg-preview.png" alt="Bitmoji" style="
+  position: fixed;
+  top: 69%;
+  left: calc(50% + 120px);
+  transform: translate(-50%, -50%) scale(0);
+  width: 120px;
+  opacity: 0;
+  transition: all 1s ease;
+  z-index: 1000;
+">
 
-    function openEnvelope() {
+<div id="close-btn" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 2rem;
+  color: #ff4da6;
+  cursor: pointer;
+  z-index: 1100;
+  display: none;
+">×</div>
+
+<script>
+const envelope = document.getElementById("envelope");
+const mainContent = document.getElementById("main-content");
+const music = document.getElementById("bg-music");
+const zoomMsg = document.getElementById("zoom-msg");
+let holdTimeout;
+const emojis = ["❤️","🎁","💖","🎉","✨"];
+
+// Set background music volume softly and unmute on first click/tap
+music.volume = 0.3;
+document.addEventListener("click", () => { music.muted = false; }, { once:true });
+document.addEventListener("touchstart", () => { music.muted = false; }, { once:true });
+
+function createFallingEmoji() {
+  const emoji = document.createElement("div");
+  emoji.classList.add("falling");
+  emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+  emoji.style.left = Math.random() * window.innerWidth + "px";
+  emoji.style.fontSize = (20 + Math.random() * 30) + "px";
+  document.body.appendChild(emoji);
+  setTimeout(() => emoji.remove(), 5000);
+}
+
+function showZoomCard() {
+  // Envelope fall
+  envelope.classList.add("fall");
+
+  // Duplicate card
+  const originalCard = envelope.querySelector(".card");
+  const rect = originalCard.getBoundingClientRect();
+  const zoomCard = document.createElement("div");
+  zoomCard.className = "card-zoom";
+  zoomCard.innerHTML = originalCard.innerHTML;
+
+  zoomCard.style.top = rect.top + "px";
+  zoomCard.style.left = rect.left + "px";
+  zoomCard.style.width = rect.width + "px";
+  zoomCard.style.height = rect.height + "px";
+
+  document.body.appendChild(zoomCard);
+
+  // Blur background
+  mainContent.classList.add("blur");
+
+  // Animate zoom
+  requestAnimationFrame(() => {
+    zoomCard.style.top = "50%";
+    zoomCard.style.left = "50%";
+    zoomCard.style.width = "320px";
+    zoomCard.style.height = "auto";
+    zoomCard.style.transform = "translate(-50%, -50%) scale(1.4)";
+  });
+
+  // Show fade-in message below zoom card
+  setTimeout(() => { zoomMsg.classList.add("show"); }, 1200);
+}
+
+function openEnvelope() {
   envelope.classList.add("open");
 
-  // 🎶 Play music softly
-  const music = document.getElementById("bg-music");
-  music.volume = 0.3;
-  music.play();
+  // Play party sound
+  const partySound = document.getElementById("party-sound");
+  partySound.volume = 0.7;
+  partySound.play();
 
-  // 🎁 Falling emojis (last longer now)
+  // Falling emojis
   const interval = setInterval(createFallingEmoji, 400);
-  setTimeout(() => clearInterval(interval), 12000);
+  setTimeout(() => clearInterval(interval), 6000);
 
-  // after card peeks out
+  // Show zoom card after peek
+  setTimeout(showZoomCard, 1000);
+}
+
+// Desktop hold
+envelope.addEventListener("mousedown", () => { holdTimeout = setTimeout(openEnvelope, 800); });
+envelope.addEventListener("mouseup", () => clearTimeout(holdTimeout));
+envelope.addEventListener("mouseleave", () => clearTimeout(holdTimeout));
+
+// Mobile hold
+envelope.addEventListener("touchstart", () => { holdTimeout = setTimeout(openEnvelope, 800); });
+envelope.addEventListener("touchend", () => clearTimeout(holdTimeout));
+
+const closeBtn = document.getElementById("close-btn");
+
+function resetAnimation() {
+  // Remove zoom card
+  const zoomCard = document.querySelector(".card-zoom");
+  if (zoomCard) zoomCard.remove();
+
+  // Remove fade-in message
+  zoomMsg.classList.remove("show");
+
+  // Remove blur
+  mainContent.classList.remove("blur");
+
+  // Reset envelope
+  envelope.classList.remove("fall");
+  envelope.classList.remove("open");
+
+  // Remove all falling emojis
+  document.querySelectorAll(".falling").forEach(e => e.remove());
+
+  // Hide close button
+  closeBtn.style.display = "none";
+}
+
+// Show close button when zoom card appears
+function showZoomCard() {
+  envelope.classList.add("fall");
+
+  const originalCard = envelope.querySelector(".card");
+  const rect = originalCard.getBoundingClientRect();
+
+  const zoomCard = document.createElement("div");
+  zoomCard.className = "card-zoom";
+  zoomCard.innerHTML = originalCard.innerHTML;
+
+  zoomCard.style.top = rect.top + "px";
+  zoomCard.style.left = rect.left + "px";
+  zoomCard.style.width = rect.width + "px";
+  zoomCard.style.height = rect.height + "px";
+
+  document.body.appendChild(zoomCard);
+
+  mainContent.classList.add("blur");
+
+  requestAnimationFrame(() => {
+    zoomCard.style.top = "50%";
+    zoomCard.style.left = "50%";
+    zoomCard.style.width = "320px";
+    zoomCard.style.height = "auto";
+    zoomCard.style.transform = "translate(-50%, -50%) scale(1.4)";
+  });
+
   setTimeout(() => {
-    // make envelope fall
-    envelope.classList.add("fall");
+    zoomMsg.classList.add("show");
+    closeBtn.style.display = "block"; // show the close button
+  }, 1200);
+}
 
-    // duplicate card
-    const originalCard = envelope.querySelector(".card");
-    const rect = originalCard.getBoundingClientRect();
+// Add click to reset
+closeBtn.addEventListener("click", resetAnimation);
 
-    const zoomCard = document.createElement("div");
-    zoomCard.className = "card-zoom";
-    zoomCard.innerHTML = originalCard.innerHTML;
+function resetAnimation() {
+  // Remove zoom card
+  const zoomCard = document.querySelector(".card-zoom");
+  if (zoomCard) zoomCard.remove();
 
-    // Add close button
-    const closeBtn = document.createElement("button");
-    closeBtn.innerText = "✖";
-    closeBtn.className = "close-btn";
-    zoomCard.appendChild(closeBtn);
+  // Hide fade-in message
+  zoomMsg.classList.remove("show");
 
-    // match position & size
-    zoomCard.style.top = rect.top + "px";
-    zoomCard.style.left = rect.left + "px";
-    zoomCard.style.width = rect.width + "px";
-    zoomCard.style.height = rect.height + "px";
+  // Remove blur
+  mainContent.classList.remove("blur");
 
-    document.body.appendChild(zoomCard);
+  // Reset envelope
+  envelope.classList.remove("fall");
+  envelope.classList.remove("open");
 
-    // Animate zoom to center
-    requestAnimationFrame(() => {
-      zoomCard.style.top = "50%";
-      zoomCard.style.left = "50%";
-      zoomCard.style.width = "320px";
-      zoomCard.style.height = "auto";
-      zoomCard.style.transform = "translate(-50%, -50%) scale(1.4)";
-    });
+  // Remove emojis
+  document.querySelectorAll(".falling").forEach(e => e.remove());
 
-    // Close button action
-    closeBtn.addEventListener("click", () => {
-      zoomCard.remove();
-      envelope.classList.remove("open", "fall");
-    });
-  }, 1500);
+  // Hide close button
+  closeBtn.style.display = "none";
+
+  // 🎂 Show cake + Bitmoji
+  const cake = document.getElementById("cake");
+  const bitmoji = document.getElementById("bitmoji");
+  cake.style.opacity = "1";
+  cake.style.transform = "translate(-50%, -50%) scale(1)";
+  bitmoji.style.opacity = "1";
+  bitmoji.style.transform = "translate(-50%, -50%) scale(1)";
 }
 
 
-    // Desktop hold
-    envelope.addEventListener("mousedown", () => {
-      holdTimeout = setTimeout(openEnvelope, 800);
-    });
-    envelope.addEventListener("mouseup", () => clearTimeout(holdTimeout));
-    envelope.addEventListener("mouseleave", () => clearTimeout(holdTimeout));
+</script>
 
-    // Mobile hold
-    envelope.addEventListener("touchstart", () => {
-      holdTimeout = setTimeout(openEnvelope, 800);
-    });
-    envelope.addEventListener("touchend", () => clearTimeout(holdTimeout));
-  </script>
 </body>
 </html>
-
-
